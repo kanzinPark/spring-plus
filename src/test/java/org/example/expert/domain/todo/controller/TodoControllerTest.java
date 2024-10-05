@@ -12,7 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.web.servlet.FlashMap;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
 
@@ -64,8 +69,7 @@ class TodoControllerTest {
         long todoId = 1L;
 
         // when
-        when(todoService.getTodo(todoId))
-                .thenThrow(new InvalidRequestException("Todo not found"));
+        when(todoService.getTodo(todoId)).thenThrow(new InvalidRequestException("Todo not found"));
 
         // then
          mockMvc.perform(get("/todos/{todoId}", todoId))
@@ -75,3 +79,5 @@ class TodoControllerTest {
                 .andExpect(jsonPath("$.message").value("Todo not found"));
     }
 }
+
+

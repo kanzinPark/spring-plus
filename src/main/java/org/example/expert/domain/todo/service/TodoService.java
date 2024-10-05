@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = false)
@@ -63,10 +65,8 @@ public class TodoService {
         ));
     }
 
-    public TodoResponse getTodo(long todoId) {
-        Todo todo = todoRepository.findByIdWithUser(todoId)
-                .orElseThrow(() -> new InvalidRequestException("Todo not found"));
-
+    public TodoResponse getTodo(long todoId) throws InvalidRequestException {
+        Todo todo = todoRepository.findByIdWithUser(todoId).orElseThrow(() -> new InvalidRequestException("Todo not found"));
         User user = todo.getUser();
 
         return new TodoResponse(
@@ -78,5 +78,12 @@ public class TodoService {
                 todo.getCreatedAt(),
                 todo.getModifiedAt()
         );
+    }
+
+    public Page<TodoResponse> getTodos(String weather, LocalDateTime startDate, LocalDateTime endDate, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Todo> todos = todoRepository.findTodosByConditions(weather, startDate, endDate, pageable);
+
+        return todos.map(TodoResponse::fromEntity);
     }
 }
